@@ -60,6 +60,12 @@ public class Utility
 
 
 
+    public static int dpSize(Context context, int sizeInDp) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (sizeInDp * scale + 0.5f);
+    }
+
+
 
 
     public static List<Tree> generateTrees()

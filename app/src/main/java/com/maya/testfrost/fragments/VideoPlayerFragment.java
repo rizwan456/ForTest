@@ -2,38 +2,52 @@ package com.maya.testfrost.fragments;
 
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.maya.testfrost.R;
 import com.maya.testfrost.constants.Constants;
 import com.maya.testfrost.interfaces.fragments.IFragment;
+import com.maya.testfrost.utils.Utility;
 
 
 import butterknife.BindView;
@@ -64,6 +78,12 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     @BindView(R.id.imgClose)
     ImageView imgClose;
 
+    @BindView(R.id.imgResize)
+    ImageView imgResize;
+
+    @BindView(R.id.llPlayer)
+    LinearLayout llPlayer;
+
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
@@ -76,6 +96,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     private DefaultTrackSelector trackSelector;
     private boolean shouldAutoPlay;
     private BandwidthMeter bandwidthMeter;
+
+
 
 
 
@@ -123,6 +145,18 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
             activity().onBackPressed();
         });
 
+        imgResize.setOnClickListener(v ->{
+            if(playerView!=null)
+            {
+                imgResize.setImageResource(activity().getRequestedOrientation()==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE?R.drawable.exo_controls_fullscreen_enter:R.drawable.exo_controls_fullscreen_exit);
+                activity().setRequestedOrientation(activity().getRequestedOrientation()==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                //hideSystemUi();
+            }
+
+        });
+
+
+
 
     }
 
@@ -133,16 +167,40 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
         {
             return;
         }
+        if(player!=null)
+        {
+            return;
+        }
         playerView.requestFocus();
+
+        bandwidthMeter = new DefaultBandwidthMeter();
+
+
+
         TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+                new AdaptiveTrackSelection.Factory();
+
         trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        DefaultAllocator allocator = new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE);
+        // Here
+
         player = ExoPlayerFactory.newSimpleInstance(activity(), trackSelector);
         playerView.setPlayer(player);
         player.setPlayWhenReady(shouldAutoPlay);
+
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(activity(), Util.getUserAgent(activity(), "IPOLL"));
-        MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-        player.prepare(mediaSource);
+
+//        MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
+//        player.prepare(mediaSource);
+
+        DefaultHlsExtractorFactory defaultHlsExtractorFactory = new DefaultHlsExtractorFactory(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES);
+        MediaSource mediaSource = new HlsMediaSource.Factory(dataSourceFactory)
+                .setExtractorFactory(defaultHlsExtractorFactory)
+                .createMediaSource(uri);
+
+        LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
+        player.prepare(loopingSource);
+
 
 
         player.addListener(new Player.EventListener() {
@@ -229,7 +287,10 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     @Override
     public void onStart() {
         super.onStart();
-        initializePlayer();
+        if (player == null)
+        {
+            initializePlayer();
+        }
     }
 
     @Override
@@ -239,18 +300,50 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
         {
             initializePlayer();
         }
+        else
+        {
+            shouldAutoPlay = true;
+            player.setPlayWhenReady(true);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        releasePlayer();
+        if (player == null)
+        {
+
+        }
+        else
+        {
+            shouldAutoPlay = false;
+            player.setPlayWhenReady(false);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        if (Util.SDK_INT <= 23)
+        {
+            releasePlayer();
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         releasePlayer();
+    }
+
+
+    private void hideSystemUi() {
+        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION );
     }
 
     @Override

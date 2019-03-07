@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
 
     private void setUp()
     {
-
+        appBarLayout.setVisibility(View.GONE);
         handler = new Handler();
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -131,9 +131,11 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
 
         changeTitle("Root View");
 
+        playVideo("https://dlkteeygs75wb.cloudfront.net/2580fe71-2455-4aef-b66b-e841dc35dd3d/hls/ds.m3u8");
 
 
-        addVideoPlayer();
+
+        //addVideoPlayer();
 
 
     }
@@ -277,4 +279,7 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
 
         }
     }
+
+
+
 }
