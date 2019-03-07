@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#70000000"
+    android:background="#77000000"
+    android:id="@+id/rlController"
     android:orientation="vertical">
 
 
@@ -31,31 +32,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="4dp"
-            android:orientation="horizontal">
 
-
-
-            <ImageButton android:id="@id/exo_rew"
-                style="@style/ExoMediaButton.Rewind"/>
-
-            <ImageButton android:id="@id/exo_play"
-                style="@style/ExoMediaButton.Play"/>
-
-            <ImageButton android:id="@id/exo_pause"
-                style="@style/ExoMediaButton.Pause"/>
-
-
-            <ImageButton android:id="@id/exo_ffwd"
-                style="@style/ExoMediaButton.FastForward"/>
-
-
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -98,14 +75,45 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ProgressBar
-        android:padding="4dp"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/white"
-        android:layout_centerHorizontal="true"
+
+    <LinearLayout
         android:layout_centerVertical="true"
-        android:id="@+id/progressBar"
-        android:layout_width="35dp"
-        android:layout_height="35dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:orientation="horizontal">
+
+
+
+        <ImageButton android:id="@id/exo_rew"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            style="@style/ExoMediaButton.Rewind"/>
+
+        <ImageView android:id="@id/exo_play"
+            android:src="@drawable/exo_icon_play"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+        <ImageView
+            android:src="@drawable/exo_icon_pause"
+            android:id="@id/exo_pause"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+
+        <ImageButton android:id="@id/exo_ffwd"
+            android:layout_weight="1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            style="@style/ExoMediaButton.FastForward"/>
+
+
+
+    </LinearLayout>
+
 
 </RelativeLayout>
