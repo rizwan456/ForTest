@@ -7,6 +7,4 @@ public enum VideoPlayerStage
     MIN_SCREEN,
     FULL_SCREEN,
     FLOATING,
-
-
 }

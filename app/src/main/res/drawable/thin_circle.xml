@@ -18,19 +18,11 @@
     <!--</shape>-->
 <!--</rotate>-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@android:id/background">
-        <shape
-            android:shape="ring"
-            android:innerRadius="35dp"
-            android:thickness="20dp"
-            android:useLevel="false">
-        </shape>
-    </item>
+
     <item android:id="@android:id/progress">
         <rotate android:toDegrees="360">
             <shape
                 android:shape="ring"
-                android:innerRadius="35dp"
                 android:thickness="2.5dp"
                 android:useLevel="false">
                 <gradient

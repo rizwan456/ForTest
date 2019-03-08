@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#77000000"
+    android:orientation="vertical">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rlController"
+    android:orientation="vertical">
+
+
+    <ImageView
+        android:id="@+id/imgClose"
+        android:layout_margin="10dp"
+        android:layout_alignParentLeft="true"
+        android:tint="@color/white"
+        android:src="@drawable/ic_close"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+
+    <ImageView
+        android:id="@+id/imgResize"
+        android:layout_margin="10dp"
+        android:layout_alignParentRight="true"
+        android:tint="@color/white"
+        android:src="@drawable/ic_fullscreen"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView android:id="@id/exo_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:includeFontPadding="false"
+                android:textColor="#FFBEBEBE"/>
+
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
+                android:id="@id/exo_progress"
+                app:played_color="#FF0000"
+                app:unplayed_color="#55A0A0A0"
+                app:bar_height="2dp"
+                app:buffered_color="#FFFFFF"
+                app:scrubber_enabled_size="5dp"
+                app:scrubber_disabled_size="0dp"
+                app:scrubber_dragged_size="5dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView android:id="@id/exo_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:includeFontPadding="false"
+                android:textColor="#FFBEBEBE"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:orientation="horizontal">
+
+
+
+        <ImageView android:id="@id/exo_rew"
+            android:layout_weight="1"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:tint="#f0f0f0"
+            style="@style/ExoMediaButton.Rewind"/>
+
+        <ImageView android:id="@id/exo_play"
+            android:src="@drawable/exo_icon_play"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+        <ImageView
+            android:src="@drawable/exo_icon_pause"
+            android:id="@id/exo_pause"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+
+        <ImageView android:id="@id/exo_ffwd"
+            android:layout_weight="1"
+            android:tint="#f0f0f0"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            style="@style/ExoMediaButton.FastForward"/>
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
+
+</FrameLayout>

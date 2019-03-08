@@ -9,6 +9,7 @@
 
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/imgClose"
         android:layout_margin="10dp"
         android:layout_alignParentLeft="true"
@@ -18,6 +19,7 @@
         android:layout_height="30dp" />
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/imgResize"
         android:layout_margin="10dp"
         android:layout_alignParentRight="true"
@@ -41,7 +43,9 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView android:id="@id/exo_position"
+            <TextView
+                android:visibility="gone"
+                android:id="@id/exo_position"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
@@ -62,7 +66,9 @@
                 android:layout_weight="1"
                 android:layout_height="26dp"/>
 
-            <TextView android:id="@id/exo_duration"
+            <TextView
+                android:visibility="gone"
+                android:id="@id/exo_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
@@ -87,28 +93,34 @@
 
 
 
-        <ImageButton android:id="@id/exo_rew"
+        <ImageView
+            android:visibility="gone"
+            android:id="@id/exo_rew"
             android:layout_weight="1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:tint="#f0f0f0"
             style="@style/ExoMediaButton.Rewind"/>
 
         <ImageView android:id="@id/exo_play"
             android:src="@drawable/exo_icon_play"
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
 
         <ImageView
             android:src="@drawable/exo_icon_pause"
             android:id="@id/exo_pause"
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
 
 
-        <ImageButton android:id="@id/exo_ffwd"
+        <ImageView
+            android:visibility="gone"
+            android:id="@id/exo_ffwd"
             android:layout_weight="1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:tint="#f0f0f0"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             style="@style/ExoMediaButton.FastForward"/>
 
 
