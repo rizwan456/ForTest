@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#664BE6</color>
-    <color name="colorPrimaryDark">#664BE6</color>
-    <color name="mainColorPrimary">#1163EE</color>
-    <color name="mainColorPrimaryDark">#1163EE</color>
+    <color name="colorPrimary">#7540EE</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="mainColorPrimary">#7540EE</color>
+    <color name="mainColorPrimaryDark">#20B2AA</color>
     <color name="colorPrimaryOther">#f74895</color>
     <color name="colorAccent">#525252</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#FFFFFFFF</color>
     <color name="black">#000000</color>
+    <color name="new_text_black">#25265E</color>
     <color name="fill_black">#EE000000</color>
     <color name="line_color">#313d54</color>
     <color name="tool_bar">#12aacc</color>
     <color name="title_color">#50626b</color>
-    <color name="membership_monthly">#0dafd4</color>
     <color name="gray_medium_tranparent">#75171d29</color>
     <color name="app_background_color">#f7f7f7</color>
+    <color name="background_color">#fcfcfc</color>
     <color name="badge_color">#FF5757</color>
     <color name="love_color">#f74895</color>
     <color name="bold_text_color">#B91A30</color>
     <color name="little_gray_background">#8CECECEF</color>
     <color name="gray">#505050</color>
-    <color name="gray_other">#909090</color>
-    <color name="service_request">#FF68E6</color>
 
     <color name="hint_alert">#FC544F</color>
     <color name="hint_right">#2CB761</color>
@@ -32,7 +31,6 @@
     <color name="app_transparent">#00000000</color>
     <color name="map_transparent">#4D7A7A7A</color>
     <color name="other_transparent">#55000000</color>
-    <color name="live">#f40040</color>
 
     <color name="other_red">#f40040</color>
     <color name="icon_color">#525252</color>
@@ -41,15 +39,16 @@
     <color name="text_color">#404040</color>
     <color name="normal_text_color">#5c5c5c</color>
     <color name="hash_text_color">#999999</color>
+    <color name="other_text_color">#787993</color>
     <color name="light_gray">#C4c4c4</color>
-
-    <color name="end_color">#6862F8</color>
+    <color name="light_other_gray">#DFDFE4</color>
 
 
     <color name="light_primary">#848FD6</color>
     <color name="light_started">#84D688</color>
     <color name="green_checkout">#5FB343</color>
     <color name="light_orange">#fe5722</color>
+    <color name="light_violet">#5D5386</color>
 
     <color name="sky_blue">#275CDC</color>
     <color name="sky_blue_new">#279fDC</color>
@@ -64,7 +63,27 @@
     <color name="lost_password_text">#bababd</color>
 
 
-    <color name="shade_blue1">#2571C9</color>
-    <color name="shade_blue2">#3E8BE3</color>
-    <color name="shade_blue3">#60A5F3</color>
+    <color name="tab_seletced">#9B9B9B</color>
+    <color name="tab_unselected">#CDCDCD</color>
+    <color name="text_black_light">#5C5A6A</color>
+    <color name="button_green">#2FD5A1</color>
+    <color name="light_gray_text">#9E9CAA</color>
+    <color name="voilet">#36437D</color>
+
+    <color name="light_color_primary">#E3D9FC</color>
+
+
+    <color name="newColorPrimary">#FF7052</color>
+    <color name="light_new_color_primary">#FAE1DC</color>
+
+    <color name="newColorPrimary1">#2F61D5</color>
+    <color name="light_new_color_primary1">#D5DFF7</color>
+
+
+    <color name="newColorPrimary2">#2DC76D</color>
+    <color name="light_new_color_primary2">#E9F9F0</color>
+
+    <color name="newColorPrimary3">#3FB6DC</color>
+    <color name="light_new_color_primary3">#D9F0F8</color>
+
 </resources>

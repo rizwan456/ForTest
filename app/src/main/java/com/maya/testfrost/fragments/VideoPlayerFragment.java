@@ -3,6 +3,7 @@ package com.maya.testfrost.fragments;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,8 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.media.session.MediaButtonReceiver;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -26,8 +25,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -36,7 +35,6 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashChunkSource;
@@ -57,6 +55,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.maya.testfrost.R;
+import com.maya.testfrost.constants.PlayBackSpeed;
 import com.maya.testfrost.constants.VideoPlayerStage;
 import com.maya.testfrost.interfaces.fragments.IFragment;
 import com.maya.testfrost.utils.Utility;
@@ -69,7 +68,7 @@ import butterknife.ButterKnife;
  * Use the {@link VideoPlayerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class VideoPlayerFragment extends Fragment implements IFragment {
+public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedController, IHeadSetsController {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -116,22 +115,28 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     @BindView(R.id.exo_rew)
     public ImageView exoRew;
 
-
     @BindView(R.id.exo_pause)
     public ImageView exoPause;
 
     @BindView(R.id.exo_play)
     public ImageView exoPlay;
 
+    @BindView(R.id.imgReplay)
+    public ImageView imgReplay;
+
     @BindView(R.id.imgMin)
     public ImageView imgMin;
+
+    @BindView(R.id.imgSettings)
+    public ImageView imgSettings;
 
     @BindView(R.id.exo_progress)
     DefaultTimeBar defaultTimeBar;
 
+    private AudioManager mAudioManager;
+    private ComponentName mRemoteControlResponder;
 
-
-
+    private PlayBackSpeed playBackSpeed = PlayBackSpeed.SP1X;
 
     private Uri uri;
 
@@ -143,9 +148,7 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     private BandwidthMeter bandwidthMeter;
     private VideoPlayerStage videoPlayerStage;
     MediaReceiver mediaReceiver;
-    PauseMediaReceiver pauseMediaReceiver;
-
-
+    public static IHeadSetsController iHeadSetsController;
 
 
     public VideoPlayerFragment() {
@@ -169,6 +172,10 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
             videoPlayerStage = VideoPlayerStage.FLOATING;
             uri = getArguments().getParcelable("Uri");
         }
+        iHeadSetsController = this;
+        mAudioManager = (AudioManager) activity().getSystemService(Context.AUDIO_SERVICE);
+        mRemoteControlResponder = new ComponentName(activity().getPackageName(),
+                HeadSetActionReceiver.class.getName());
     }
 
     @Override
@@ -182,22 +189,21 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
         return view;
     }
 
-    private void setUp()
-    {
+
+    private void setUp() {
         FrameLayout.LayoutParams params = null;
-        switch (videoPlayerStage)
-        {
+        switch (videoPlayerStage) {
             case STABLE:
-                frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,Utility.getScreenHeight(activity())/3));
+                frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Utility.getScreenHeight(activity()) / 3));
                 break;
 
             case FULL_SCREEN:
-                frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
+                frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
                 break;
 
             case FLOATING:
-                params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity())/2,Utility.dpSize(activity(),100));
-                params.setMargins(Utility.dpSize(activity(),15),Utility.dpSize(activity(),15),Utility.dpSize(activity(),15), Utility.dpSize(activity(),15));
+                params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()) / 2, Utility.dpSize(activity(), 100));
+                params.setMargins(Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15));
                 params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
 
                 frameLayout.setLayoutParams(params);
@@ -221,12 +227,11 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
 
         imgResize.setOnClickListener(v ->
         {
-            if (playerView != null)
-            {
+            if (playerView != null) {
                 imgResize.setImageResource(activity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? R.drawable.exo_controls_fullscreen_enter : R.drawable.exo_controls_fullscreen_exit);
                 frameLayout.setLayoutParams(new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                         (activity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                        ?LinearLayout.LayoutParams.MATCH_PARENT : Utility.getScreenWidth(activity())/3)));
+                                ? LinearLayout.LayoutParams.MATCH_PARENT : Utility.getScreenWidth(activity()) / 3)));
                 activity().setRequestedOrientation(activity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
                 videoPlayerStage = activity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? VideoPlayerStage.FULL_SCREEN : VideoPlayerStage.STABLE;
@@ -236,36 +241,43 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
 
         });
 
+        imgReplay.setOnClickListener(v -> {
+            if (player == null)
+                return;
+            imgReplay.setVisibility(View.GONE);
+            shouldAutoPlay = true;
+            player.setPlayWhenReady(true);
+        });
+
+
+        imgSettings.setOnClickListener(v -> {
+            BSDVideoActionFragment.newInstance(playBackSpeed, this).show(getChildFragmentManager(), "BSDVideoActionFragment");
+        });
+
+
         imgMin.setOnClickListener(v -> {
-            if(playerView!=null)
-            {
-                if(videoPlayerStage==VideoPlayerStage.STABLE)
-                {
-                    FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity())/2,Utility.dpSize(activity(),100));
-                    params1.setMargins(Utility.dpSize(activity(),15),Utility.dpSize(activity(),15),Utility.dpSize(activity(),15), Utility.dpSize(activity(),15));
+            if (playerView != null) {
+                if (videoPlayerStage == VideoPlayerStage.STABLE) {
+                    FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()) / 2, Utility.dpSize(activity(), 100));
+                    params1.setMargins(Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15));
                     params1.gravity = Gravity.RIGHT | Gravity.BOTTOM;
 
                     frameLayout.setLayoutParams(params1);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         frameLayout.setElevation(8);
                     }
 
                     videoPlayerStage = VideoPlayerStage.FLOATING;
                     updateControllers();
 
-                }
-                else if(videoPlayerStage == VideoPlayerStage.FLOATING)
-                {
-                    frameLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,Utility.getScreenHeight(activity())/3));
+                } else if (videoPlayerStage == VideoPlayerStage.FLOATING) {
+                    frameLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, Utility.getScreenHeight(activity()) / 3));
                     videoPlayerStage = VideoPlayerStage.STABLE;
                     updateControllers();
                 }
 
-              }
+            }
         });
-
-
 
 
     }
@@ -288,31 +300,28 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
                 new AdaptiveTrackSelection.Factory();
 
         trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        // Here
 
-        player = ExoPlayerFactory.newSimpleInstance(activity(), trackSelector);
+
+        // Here CustomLoadControl for more buffer for two side
+
+        player = ExoPlayerFactory.newSimpleInstance(activity(), new DefaultRenderersFactory(activity()), trackSelector, new CustomLoadControl());
         playerView.setControllerHideOnTouch(true);
         playerView.setControllerShowTimeoutMs(1500);
         playerView.setPlayer(player);
 
 
-        activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView),new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        intentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
+        activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView), new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
-        activity().registerReceiver(pauseMediaReceiver = new PauseMediaReceiver(playerView),intentFilter);
 
         player.setPlayWhenReady(shouldAutoPlay);
 
 
-
-
-
-
         MediaSource mediaSource = buildMediaSource(uri);
 
-        LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
-        player.prepare(loopingSource);
+        player.prepare(mediaSource);
+
+//        LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
+//        player.prepare(loopingSource);
 
 
         player.addListener(new Player.EventListener() {
@@ -336,18 +345,18 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
                 switch (playbackState) {
                     case Player.STATE_IDLE:
                         progressBar.setVisibility(View.GONE);
+                        imgReplay.setVisibility(View.GONE);
                         break;
                     case Player.STATE_BUFFERING:
                         progressBar.setVisibility(View.VISIBLE);
-
+                        imgReplay.setVisibility(View.GONE);
                         break;
                     case Player.STATE_READY:
                         progressBar.setVisibility(View.GONE);
-
+                        imgReplay.setVisibility(View.GONE);
                         break;
                     case Player.STATE_ENDED:
                         progressBar.setVisibility(View.GONE);
-
                         break;
                 }
             }
@@ -380,14 +389,14 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
             @Override
             public void onSeekProcessed() {
 
+
             }
         });
 
     }
 
 
-    private MediaSource buildMediaSource(Uri uri)
-    {
+    private MediaSource buildMediaSource(Uri uri) {
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(activity(), Util.getUserAgent(activity(), "IPOLL"));
 
@@ -421,30 +430,25 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
         super.onStart();
         if (player == null) {
             initializePlayer();
-
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
+        activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView), new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
         if (player == null) {
             initializePlayer();
         } else {
-            shouldAutoPlay = true;
-            player.setPlayWhenReady(true);
-            activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView),new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-
-            IntentFilter intentFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-            intentFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
-            activity().registerReceiver(pauseMediaReceiver = new PauseMediaReceiver(playerView),intentFilter);
-
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
+
         if (player == null) {
 
         } else {
@@ -452,11 +456,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
             player.setPlayWhenReady(false);
         }
 
-        if(mediaReceiver!=null)
-         activity().unregisterReceiver(mediaReceiver);
-
-        if(pauseMediaReceiver!=null)
-         activity().unregisterReceiver(pauseMediaReceiver);
+        if (mediaReceiver != null)
+            activity().unregisterReceiver(mediaReceiver);
     }
 
     @Override
@@ -472,35 +473,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     public void onDestroy() {
         super.onDestroy();
         releasePlayer();
-        if(mediaReceiver!=null)
-        activity().unregisterReceiver(mediaReceiver);
-
-        if(pauseMediaReceiver!=null)
-            activity().unregisterReceiver(pauseMediaReceiver);
     }
 
-
-    private void hideSystemUi() {
-        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-    }
-
-
-    private void decorateUi() {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                View decorView = activity().getWindow().getDecorView();
-                int uiOptions =
-                         View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-                decorView.setSystemUiVisibility(uiOptions);
-            }
-    }
 
     @Override
     public void changeTitle(String title) {
@@ -517,34 +491,41 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
     }
 
 
-    public void updateControllers()
-    {
+    public void updateControllers() {
         RelativeLayout.LayoutParams params = null;
-        switch (videoPlayerStage)
-        {
+        switch (videoPlayerStage) {
             case STABLE:
                 llFrd.setVisibility(View.VISIBLE);
                 llRew.setVisibility(View.VISIBLE);
                 llBottomContent.setVisibility(View.VISIBLE);
-                exoFwd.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),24),Utility.dpSize(activity(),24)));
-                exoRew.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),24),Utility.dpSize(activity(),24)));
-                exoPause.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),40),Utility.dpSize(activity(),40)));
-                exoPlay.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),40),Utility.dpSize(activity(),40)));
-                params = new RelativeLayout.LayoutParams(Utility.dpSize(activity(),100),Utility.dpSize(activity(),100));
+                exoFwd.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24)));
+                exoRew.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24)));
+                exoPause.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 40), Utility.dpSize(activity(), 40)));
+                exoPlay.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 40), Utility.dpSize(activity(), 40)));
+                params = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 100), Utility.dpSize(activity(), 100));
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 progressBar.setLayoutParams(params);
 
                 imgMin.setVisibility(View.VISIBLE);
 
-                RelativeLayout.LayoutParams minParams = new RelativeLayout.LayoutParams(Utility.dpSize(activity(),24),Utility.dpSize(activity(),24));
-                minParams.setMargins(Utility.dpSize(activity(),10),Utility.dpSize(activity(),10),Utility.dpSize(activity(),10),Utility.dpSize(activity(),10));
+                RelativeLayout.LayoutParams minParams = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24));
+                minParams.setMargins(Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10));
                 imgMin.setLayoutParams(minParams);
-                imgMin.setPadding(10,10,10,10);
+                imgMin.setPadding(10, 10, 10, 10);
                 imgMin.setImageResource(R.drawable.ic_min_view);
 
+
+                minParams = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24));
+                minParams.setMargins(Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10));
+                minParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                imgSettings.setLayoutParams(minParams);
+
+
+                imgSettings.setVisibility(View.VISIBLE);
+
                 defaultTimeBar.setVisibility(View.VISIBLE);
-                defaultTimeBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+                defaultTimeBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
 
                 break;
@@ -553,20 +534,29 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
                 llFrd.setVisibility(View.VISIBLE);
                 llRew.setVisibility(View.VISIBLE);
                 llBottomContent.setVisibility(View.VISIBLE);
-                exoFwd.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),24),Utility.dpSize(activity(),24)));
-                exoRew.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),24),Utility.dpSize(activity(),24)));
-                exoPause.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),50),Utility.dpSize(activity(),50)));
-                exoPlay.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),50),Utility.dpSize(activity(),50)));
-                params = new RelativeLayout.LayoutParams(Utility.dpSize(activity(),100),Utility.dpSize(activity(),100));
+                exoFwd.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24)));
+                exoRew.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24)));
+                exoPause.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 50), Utility.dpSize(activity(), 50)));
+                exoPlay.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 50), Utility.dpSize(activity(), 50)));
+                params = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 100), Utility.dpSize(activity(), 100));
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 progressBar.setLayoutParams(params);
 
                 imgMin.setVisibility(View.GONE);
 
-                defaultTimeBar.setVisibility(View.VISIBLE);
-                defaultTimeBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+                RelativeLayout.LayoutParams minParams11 = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 24), Utility.dpSize(activity(), 24));
+                minParams11.setMargins(Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10), Utility.dpSize(activity(), 10));
 
+                minParams11.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                imgSettings.setLayoutParams(minParams11);
+                imgSettings.setVisibility(View.VISIBLE);
+
+
+                defaultTimeBar.setVisibility(View.VISIBLE);
+                defaultTimeBar.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                imgSettings.setVisibility(View.VISIBLE);
 
 
                 break;
@@ -575,27 +565,29 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
                 llFrd.setVisibility(View.GONE);
                 llRew.setVisibility(View.GONE);
                 llBottomContent.setVisibility(View.GONE);
-                exoPause.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),20),Utility.dpSize(activity(),20)));
-                exoPlay.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(),20),Utility.dpSize(activity(),20)));
-                params = new RelativeLayout.LayoutParams(Utility.dpSize(activity(),50),Utility.dpSize(activity(),50));
+                exoPause.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 20), Utility.dpSize(activity(), 20)));
+                exoPlay.setLayoutParams(new LinearLayout.LayoutParams(Utility.dpSize(activity(), 20), Utility.dpSize(activity(), 20)));
+                params = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 50), Utility.dpSize(activity(), 50));
                 params.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 progressBar.setLayoutParams(params);
 
                 imgMin.setVisibility(View.VISIBLE);
 
-                RelativeLayout.LayoutParams minParams1 = new RelativeLayout.LayoutParams(Utility.dpSize(activity(),20),Utility.dpSize(activity(),20));
-                minParams1.setMargins(Utility.dpSize(activity(),7),Utility.dpSize(activity(),7),Utility.dpSize(activity(),7),Utility.dpSize(activity(),7));
+                RelativeLayout.LayoutParams minParams1 = new RelativeLayout.LayoutParams(Utility.dpSize(activity(), 20), Utility.dpSize(activity(), 20));
+                minParams1.setMargins(Utility.dpSize(activity(), 7), Utility.dpSize(activity(), 7), Utility.dpSize(activity(), 7), Utility.dpSize(activity(), 7));
                 imgMin.setLayoutParams(minParams1);
-                imgMin.setPadding(10,10,10,10);
+                imgMin.setPadding(10, 10, 10, 10);
                 imgMin.setImageResource(R.drawable.ic_stable_view);
 
                 defaultTimeBar.setVisibility(View.VISIBLE);
 
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,Utility.dpSize(activity(),3));
-                layoutParams.setMargins(-Utility.dpSize(activity(),10),0,-Utility.dpSize(activity(),10),0);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Utility.dpSize(activity(), 3));
+                layoutParams.setMargins(-Utility.dpSize(activity(), 10), 0, -Utility.dpSize(activity(), 10), 0);
                 defaultTimeBar.setLayoutParams(layoutParams);
 
+
+                imgSettings.setVisibility(View.GONE);
                 break;
 
             case PIP:
@@ -606,8 +598,64 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
         }
     }
 
+    @Override
+    public void setPlaybackSpeed(PlayBackSpeed playbackSpeed) {
+        this.playBackSpeed = playbackSpeed;
+        if (player != null) {
+            PlaybackParameters params = null;
 
+            switch (playbackSpeed) {
+                case SPp25X:
+                    params = new PlaybackParameters(0.25f);
 
+                    break;
+
+                case SPp5X:
+                    params = new PlaybackParameters(0.5f);
+
+                    break;
+
+                case SPp75X:
+                    params = new PlaybackParameters(0.75f);
+
+                    break;
+
+                case SP1X:
+                    params = new PlaybackParameters(1f);
+
+                    break;
+
+                case SP1p25X:
+                    params = new PlaybackParameters(1.25f);
+
+                    break;
+
+                case SP1p5X:
+                    params = new PlaybackParameters(1.5f);
+
+                    break;
+
+                case SP1p75X:
+                    params = new PlaybackParameters(1.75f);
+                    break;
+
+                case SP2X:
+                    params = new PlaybackParameters(2f);
+                    break;
+            }
+
+            if (params != null)
+                player.setPlaybackParameters(params);
+        }
+    }
+
+    @Override
+    public void applyAction() {
+        if (player != null) {
+            shouldAutoPlay = !shouldAutoPlay;
+            player.setPlayWhenReady(shouldAutoPlay);
+        }
+    }
 
 
     public class MediaReceiver extends BroadcastReceiver {
@@ -619,59 +667,13 @@ public class VideoPlayerFragment extends Fragment implements IFragment {
 
         @Override
         public void onReceive(final Context context, Intent intent) {
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction()))
-            {
-                if(playerView!=null)
-                {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                if (playerView != null) {
                     shouldAutoPlay = false;
                     player.setPlayWhenReady(false);
                 }
 
             }
-        }
-    }
-
-
-
-    public class PauseMediaReceiver extends BroadcastReceiver {
-        private PlayerView playerView;
-
-        public PauseMediaReceiver(PlayerView playerView) {
-            this.playerView = playerView;
-        }
-
-        @Override
-        public void onReceive(final Context context, Intent intent)
-        {
-            KeyEvent key = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-
-            if(!Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction()))
-            {
-                Log.d("TAG","" + intent.getAction());
-                return;
-            }
-            // This is just some example logic, you may want to change this for different behaviour
-//            if(key==null) return;
-//            if(key.getAction() == KeyEvent.ACTION_UP)
-//            {
-//                int keycode = key.getKeyCode();
-//
-//                // These are examples for detecting key presses on a Nexus One headset
-//                if(keycode == KeyEvent.KEYCODE_MEDIA_NEXT)
-//                {
-//                }
-//                else if(keycode == KeyEvent.KEYCODE_MEDIA_PREVIOUS)
-//                {
-//                }
-//                else if(keycode == KeyEvent.KEYCODE_HEADSETHOOK)
-//                {
-//                    if(playerView!=null)
-//                    {
-                        shouldAutoPlay = shouldAutoPlay?false:true;
-                        player.setPlayWhenReady(shouldAutoPlay);
-//                    }
-//                }
-//            }
         }
     }
 

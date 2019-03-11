@@ -33,6 +33,15 @@
             android:layout_width="24dp"
             android:layout_height="24dp" />
 
+        <ImageView
+            android:id="@+id/imgSettings"
+            android:layout_margin="10dp"
+            android:layout_alignParentRight="true"
+            android:tint="@color/white"
+            android:src="@drawable/ic_more"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+
 
 
 
@@ -147,6 +156,14 @@
             <ImageView
                 android:src="@drawable/exo_icon_pause"
                 android:id="@id/exo_pause"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+
+            <ImageView
+                android:visibility="gone"
+                android:padding="4dp"
+                android:src="@drawable/ic_replay"
+                android:id="@+id/imgReplay"
                 android:layout_width="40dp"
                 android:layout_height="40dp"/>
 
