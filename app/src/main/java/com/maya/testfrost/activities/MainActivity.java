@@ -199,12 +199,12 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
             recyclerView.setAdapter(rootAdapter = new RootAdapter(treeList = Utility.generateTrees(), activity(), this));
         }, 200);
 
-        //Adding Actions for PIP
         setAction(isPlay);
+
     }
 
     //Piture in Picture Process
-    private void setAction(boolean isPlay) {
+    public void setAction(boolean isPlay) {
         actions = new ArrayList<>();
         Intent actionIntent = new Intent(BROADCAST_ACTION);
         pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, actionIntent, 0);
@@ -218,27 +218,11 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
         createPipAction();
     }
 
-    public void pictureInPictureMode()
-    {
-        if (getSupportFragmentManager().getFragments().get(0) instanceof VideoPlayerFragment) {
-            VideoPlayerFragment mediaFragment = (VideoPlayerFragment) getSupportFragmentManager().getFragments().get(0);
-//            Rational aspectRatio = new Rational(mediaFragment.frameLayout.getWidth(), mediaFragment.frameLayout.getHeight());
-////            Rational aspectRatio = new Rational(Utility.getScreenHeight(this),Utility.getScreenWidth(this));
-//            pictureInPictureParamsBuilder.setAspectRatio(aspectRatio).build();
-//            setPictureInPictureParams(pictureInPictureParamsBuilder.build());
-            mediaFragment.playerView.setUseController(false);
-        }
-    }
 
     @Override
     public void onUserLeaveHint() {
         if (getSupportFragmentManager().getFragments().get(0) instanceof VideoPlayerFragment) {
-            if (!isInPictureInPictureMode())
-            {
-                VideoPlayerFragment mediaFragment = (VideoPlayerFragment) getSupportFragmentManager().getFragments().get(0);
-//                Rational aspectRatio = new Rational(mediaFragment.playerView.getWidth(), mediaFragment.playerView.getHeight());
-                Rational aspectRatio = new Rational(mediaFragment.frameLayout.getWidth(), mediaFragment.frameLayout.getHeight());
-                pictureInPictureParamsBuilder.setAspectRatio(aspectRatio).build();
+            if (!isInPictureInPictureMode()) {
                 enterPictureInPictureMode(pictureInPictureParamsBuilder.build());
             }
         }
@@ -251,22 +235,25 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
             if (isInPictureInPictureMode) {
                 final VideoPlayerFragment mediaFragment = (VideoPlayerFragment) getSupportFragmentManager().getFragments().get(0);
                 mediaFragment.playerView.setVisibility(View.VISIBLE);
+
                 // action
                 IntentFilter filter = new IntentFilter();
+
 
                 filter.addAction(BROADCAST_ACTION);
                 receiver = new BroadcastReceiver() {
                     @Override
-                    public void onReceive(Context context, Intent intent) {
+                    public void onReceive(Context context, Intent intent)
+                    {
+                        boolean isPlay = mediaFragment.player.getPlayWhenReady();
+
                         if (isPlay) {
-                            isPlay = false;
                             setAction(false);
                             if (getSupportFragmentManager().getFragments().get(0) instanceof VideoPlayerFragment) {
                                 VideoPlayerFragment mediaFragment = (VideoPlayerFragment) getSupportFragmentManager().getFragments().get(0);
                                 mediaFragment.playVideo(false);
                             }
                         } else {
-                            isPlay = true;
                             setAction(true);
                             if (getSupportFragmentManager().getFragments().get(0) instanceof VideoPlayerFragment) {
                                 VideoPlayerFragment mediaFragment = (VideoPlayerFragment) getSupportFragmentManager().getFragments().get(0);
@@ -279,13 +266,18 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
 
             } else {
                 VideoPlayerFragment mediaFragment = (VideoPlayerFragment) getSupportFragmentManager().getFragments().get(0);
-                mediaFragment.playerView.setVisibility(View.VISIBLE);
-
+                mediaFragment.backToNormal();
                 if (receiver != null) {
                     unregisterReceiver(receiver);
                 }
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("TAGGED", "IS NEW");
     }
 
     private void createPipAction() {

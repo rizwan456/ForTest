@@ -145,12 +145,13 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     private Uri uri;
 
 
-    private SimpleExoPlayer player;
+    public SimpleExoPlayer player;
     private Timeline.Window window;
     private DefaultTrackSelector trackSelector;
     public boolean shouldAutoPlay;
     private BandwidthMeter bandwidthMeter;
-    private VideoPlayerStage videoPlayerStage;
+    private VideoPlayerStage videoPlayerStage, previousPlayerStage;
+    private FrameLayout.LayoutParams params;
     private MediaReceiver mediaReceiver;
     UsbDetectorReceiver usbDetectorReceiver;
     public static IHeadSetsController iHeadSetsController;
@@ -464,6 +465,7 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         if (player == null) {
             initializePlayer();
         }
+
     }
 
     @Override
@@ -496,13 +498,21 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         if (player == null) {
 
         } else {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                ((MainActivity) activity()).setAction(player.getPlayWhenReady());
+                previousPlayerStage = videoPlayerStage;
+                videoPlayerStage = VideoPlayerStage.PIP;
+                params = (FrameLayout.LayoutParams) frameLayout.getLayoutParams();
+                frameLayout.setLayoutParams(new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                playerView.setUseController(false);
+                return;
+            }
             shouldAutoPlay = false;
             player.setPlayWhenReady(false);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                player.setPlayWhenReady(true);
-                ((MainActivity) activity()).pictureInPictureMode();
-            }
+
         }
 
         if (mediaReceiver != null) {
@@ -515,8 +525,18 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     @Override
     public void onStop() {
         super.onStop();
-        if (Util.SDK_INT <= 23) {
+        if(videoPlayerStage == VideoPlayerStage.PIP)
+        videoPlayerStage = previousPlayerStage;
+
+        if (Util.SDK_INT <= 23)
+        {
             releasePlayer();
+        }
+        if (player == null) {
+
+        } else {
+            shouldAutoPlay = false;
+            player.setPlayWhenReady(false);
         }
 
     }
@@ -540,6 +560,42 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     @Override
     public Activity activity() {
         return getActivity();
+    }
+
+
+    public void backToNormal()
+    {
+        videoPlayerStage = previousPlayerStage;
+        frameLayout.setLayoutParams(params);
+        if (videoPlayerStage == VideoPlayerStage.FULL_SCREEN) {
+            decorateUi();
+        } else {
+            decorateScreenUi();
+        }
+//        FrameLayout.LayoutParams params = null;
+//        switch (videoPlayerStage) {
+//        case STABLE:
+//        frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()), Utility.getScreenHeight(activity()) / 3));
+//        break;
+//
+//        case FULL_SCREEN:
+//            frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()), Utility.getScreenHeight(activity()) ));
+//        break;
+//
+//        case FLOATING:
+//        params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()) / 2, Utility.dpSize(activity(), 100));
+//        params.setMargins(Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15));
+//        params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+//
+//        frameLayout.setLayoutParams(params);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            frameLayout.setElevation(10);
+//        }
+//
+//        break;
+//        }
+//
+//        updateControllers();
     }
 
 
@@ -709,7 +765,18 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     }
 
     @Override
-    public void applyAction() {
+    public void applyAction()
+    {
+        if(videoPlayerStage == VideoPlayerStage.PIP)
+        {
+            shouldAutoPlay = !player.getPlayWhenReady();
+            player.setPlayWhenReady(shouldAutoPlay);
+            if(videoPlayerStage==VideoPlayerStage.PIP)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    ((MainActivity) activity()).setAction(shouldAutoPlay);
+                }
+            return;
+        }
         if (player != null && mediaReceiver != null) {
             if (isConnected()) {
                 shouldAutoPlay = false;
@@ -781,6 +848,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     }
 
 
+
+
     public class MediaReceiver extends BroadcastReceiver {
         private PlayerView playerView;
 
@@ -791,9 +860,14 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         @Override
         public void onReceive(final Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                if (playerView != null) {
+                if (playerView != null)
+                {
                     shouldAutoPlay = false;
                     player.setPlayWhenReady(false);
+                    if(videoPlayerStage==VideoPlayerStage.PIP)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            ((MainActivity) activity()).setAction(false);
+                        }
                 }
 
             }

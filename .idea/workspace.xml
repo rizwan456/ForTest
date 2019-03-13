@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_LOG_LEVEL" value="error" />
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="verbose" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
     <option name="TOOL_WINDOW_REGEXP_FILTER" value="false" />
   </component>
@@ -20,16 +20,9 @@
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/assetWizardSettings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/assetWizardSettings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/HeadSetActionReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/HeadSetActionReceiver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_layout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/app_bar_layout.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/sub_layout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/sub_layout.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -109,10 +102,10 @@
         <counts>
           <entry key="class" value="1" />
           <entry key="gradle" value="2" />
-          <entry key="java" value="98" />
+          <entry key="java" value="104" />
           <entry key="png" value="1" />
           <entry key="properties" value="2" />
-          <entry key="xml" value="56" />
+          <entry key="xml" value="57" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
@@ -120,22 +113,22 @@
           <entry key="CLASS" value="1" />
           <entry key="Groovy" value="2" />
           <entry key="Image" value="1" />
-          <entry key="JAVA" value="98" />
+          <entry key="JAVA" value="104" />
           <entry key="Properties" value="2" />
-          <entry key="XML" value="56" />
+          <entry key="XML" value="57" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gradle" value="22" />
-          <entry key="java" value="6942" />
+          <entry key="java" value="7447" />
           <entry key="xml" value="2044" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="Groovy" value="22" />
-          <entry key="JAVA" value="6942" />
+          <entry key="JAVA" value="7447" />
           <entry key="XML" value="2044" />
         </counts>
       </usages-collector>
@@ -144,19 +137,20 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java">
+        <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="503" column="57" lean-forward="true" selection-start-line="503" selection-start-column="57" selection-end-line="503" selection-end-column="57" />
+            <state relative-caret-position="493">
+              <caret line="29" column="45" selection-start-line="29" selection-start-column="45" selection-end-line="29" selection-end-column="45" />
             </state>
           </provider>
+          <provider editor-type-id="android-manifest" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/util/Rational.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="221" column="5" lean-forward="true" selection-start-line="221" selection-start-column="5" selection-end-line="221" selection-end-column="5" />
+            <state relative-caret-position="298">
+              <caret line="100" column="11" selection-start-line="100" selection-start-column="11" selection-end-line="100" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -166,6 +160,59 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="298">
               <caret line="2113" column="19" selection-start-line="2113" selection-start-column="19" selection-end-line="2113" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="54">
+              <caret line="147" column="10" selection-start-line="147" selection-start-column="10" selection-end-line="147" selection-end-column="10" />
+              <folding>
+                <element signature="e#19603#19604#0" expanded="true" />
+                <element signature="e#19639#19640#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/widget/LinearLayout.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="918">
+              <caret line="87" column="13" selection-start-line="87" selection-start-column="13" selection-end-line="87" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/content/BroadcastReceiver.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="374">
+              <caret line="44" column="22" selection-start-line="44" selection-start-column="22" selection-end-line="44" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/constants/VideoPlayerStage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="4" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="200">
+              <caret line="249" lean-forward="true" selection-start-line="249" selection-end-line="249" />
+              <folding>
+                <element signature="e#8291#9438#0" expanded="true" />
+                <element signature="e#9437#9438#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -185,20 +232,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>unre</find>
-      <find>STATE ENDED</find>
-      <find>map_transparent</find>
-      <find>generateColorStateList(R.color.colorPrimary)</find>
-      <find>checkedIconVisible</find>
-      <find>ordinal</find>
-      <find>fatal</find>
-      <find>renderersFactory</find>
-      <find>DefaultLoadControl</find>
-      <find>default</find>
-      <find>shouldContinueLoading</find>
-      <find>change</find>
-      <find>CHANGED</find>
-      <find>resume</find>
       <find>headSetActionReceiver</find>
       <find>mediaReceiver'</find>
       <find>registerReceiver</find>
@@ -208,13 +241,27 @@
       <find>fata</find>
       <find>onResume</find>
       <find>setAction</find>
-      <find>onPause</find>
       <find>player</find>
       <find>init</find>
       <find>pictureInPictureMode</find>
       <find>isCo</find>
       <find>height</find>
+      <find>onStar</find>
+      <find>pictureInPictureParamsBuilder</find>
+      <find>onRes</find>
       <find>pause</find>
+      <find>onP</find>
+      <find>on</find>
+      <find>back</find>
+      <find>backTo</find>
+      <find>decorateUi</find>
+      <find>apply</find>
+      <find>med</find>
+      <find>icon</find>
+      <find>setAct</find>
+      <find>onPause</find>
+      <find>onPa</find>
+      <find>act</find>
     </findStrings>
     <replaceStrings>
       <replace>app_background_color</replace>
@@ -296,6 +343,11 @@
             <path>
               <item name="ForTest" type="1abcf292:AndroidViewProjectNode" />
               <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="manifests" type="f94875db:AndroidManifestsGroupNode" />
+            </path>
+            <path>
+              <item name="ForTest" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
             </path>
             <path>
@@ -303,6 +355,20 @@
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="testfrost" type="cbb59c9e:AndroidPsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ForTest" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="testfrost" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="activities" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ForTest" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="testfrost" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="adapters" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ForTest" type="1abcf292:AndroidViewProjectNode" />
@@ -473,19 +539,19 @@
       <window_info anchor="bottom" id="Run" order="0" weight="0.329718" />
       <window_info anchor="bottom" id="Logcat" order="1" sideWeight="0.4989339" weight="0.5119306" />
       <window_info anchor="bottom" id="TODO" order="2" weight="0.329718" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.5683297" />
+      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.5683297" />
       <window_info anchor="bottom" id="Terminal" order="4" weight="0.45553145" />
       <window_info anchor="bottom" id="Event Log" order="5" sideWeight="0.5010661" side_tool="true" weight="0.5119306" />
       <window_info anchor="bottom" id="Version Control" order="6" />
       <window_info anchor="bottom" id="Build" order="7" weight="0.329718" />
       <window_info anchor="bottom" id="Android Profiler" order="8" />
       <window_info anchor="bottom" id="Find" order="9" weight="0.329718" />
-      <window_info anchor="right" id="Device File Explorer" order="0" side_tool="true" />
-      <window_info anchor="right" id="Capture Analysis" order="1" />
-      <window_info anchor="right" id="Gradle" order="2" weight="0.2782516" />
-      <window_info anchor="right" id="Theme Preview" order="3" />
-      <window_info anchor="right" id="Palette&#9;" order="4" />
-      <window_info anchor="right" id="Preview" order="5" weight="0.32995737" />
+      <window_info anchor="right" id="Capture Analysis" order="0" />
+      <window_info anchor="right" id="Gradle" order="1" weight="0.2782516" />
+      <window_info anchor="right" id="Theme Preview" order="2" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info anchor="right" id="Preview" order="4" weight="0.32995737" />
+      <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" weight="0.32995737" />
     </layout>
     <layout-to-restore>
       <window_info id="Captures" order="0" side_tool="true" weight="0.25" />
@@ -545,40 +611,44 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java</url>
-          <line>508</line>
-          <properties />
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java</url>
-          <line>509</line>
-          <properties />
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java</url>
-          <line>347</line>
+          <line>348</line>
           <properties />
           <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java</url>
+          <line>532</line>
+          <properties />
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java</url>
+          <line>250</line>
+          <properties />
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java</url>
+          <line>256</line>
+          <properties />
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java</url>
+          <line>257</line>
+          <properties />
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java</url>
+          <line>251</line>
+          <properties />
+          <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/corner_radius_light_primary_30.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="57" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/corner_radius_gray_light_primary_30.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="50" selection-start-line="8" selection-start-column="50" selection-end-line="8" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/design-28.0.0.aar/5e1f29eb9d8401a0e80db7b017edc1ed/jars/classes.jar!/android/support/design/chip/Chip.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-510">
@@ -764,13 +834,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/constants/VideoPlayerStage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/content/Context.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="41990">
@@ -876,13 +939,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/app/Activity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="28" lean-forward="true" selection-start-line="22" selection-start-column="28" selection-end-line="22" selection-end-column="28" />
+        <state relative-caret-position="298">
+          <caret line="2113" column="19" selection-start-line="2113" selection-start-column="19" selection-end-line="2113" selection-end-column="19" />
         </state>
       </provider>
-      <provider editor-type-id="android-manifest" />
     </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/util/Rational.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -891,24 +953,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/app/Activity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/constants/VideoPlayerStage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="2113" column="19" selection-start-line="2113" selection-start-column="19" selection-end-line="2113" selection-end-column="19" />
+        <state relative-caret-position="68">
+          <caret line="4" column="4" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="29" column="45" selection-start-line="29" selection-start-column="45" selection-end-line="29" selection-end-column="45" />
+        </state>
+      </provider>
+      <provider editor-type-id="android-manifest" />
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/content/BroadcastReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="44" column="22" selection-start-line="44" selection-start-column="22" selection-end-line="44" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-28/android/widget/LinearLayout.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="918">
+          <caret line="87" column="13" selection-start-line="87" selection-start-column="13" selection-end-line="87" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/fragments/VideoPlayerFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="503" column="57" lean-forward="true" selection-start-line="503" selection-start-column="57" selection-end-line="503" selection-end-column="57" />
+        <state relative-caret-position="54">
+          <caret line="147" column="10" selection-start-line="147" selection-start-column="10" selection-end-line="147" selection-end-column="10" />
+          <folding>
+            <element signature="e#19603#19604#0" expanded="true" />
+            <element signature="e#19639#19640#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/maya/testfrost/activities/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="221" column="5" lean-forward="true" selection-start-line="221" selection-start-column="5" selection-end-line="221" selection-end-column="5" />
+        <state relative-caret-position="200">
+          <caret line="249" lean-forward="true" selection-start-line="249" selection-end-line="249" />
+          <folding>
+            <element signature="e#8291#9438#0" expanded="true" />
+            <element signature="e#9437#9438#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
