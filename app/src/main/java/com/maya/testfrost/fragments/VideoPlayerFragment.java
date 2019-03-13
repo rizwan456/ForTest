@@ -14,9 +14,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -33,6 +33,7 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -55,6 +56,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.maya.testfrost.R;
+import com.maya.testfrost.activities.MainActivity;
 import com.maya.testfrost.constants.PlayBackSpeed;
 import com.maya.testfrost.constants.VideoPlayerStage;
 import com.maya.testfrost.interfaces.fragments.IFragment;
@@ -136,6 +138,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     private AudioManager mAudioManager;
     private ComponentName mRemoteControlResponder;
 
+    private AlertDialog alertUsbDialog = null;
+
     private PlayBackSpeed playBackSpeed = PlayBackSpeed.SP1X;
 
     private Uri uri;
@@ -147,7 +151,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     public boolean shouldAutoPlay;
     private BandwidthMeter bandwidthMeter;
     private VideoPlayerStage videoPlayerStage;
-    MediaReceiver mediaReceiver;
+    private MediaReceiver mediaReceiver;
+    UsbDetectorReceiver usbDetectorReceiver;
     public static IHeadSetsController iHeadSetsController;
 
 
@@ -169,7 +174,7 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            videoPlayerStage = VideoPlayerStage.FLOATING;
+            videoPlayerStage = VideoPlayerStage.STABLE;
             uri = getArguments().getParcelable("Uri");
         }
         iHeadSetsController = this;
@@ -191,6 +196,7 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
 
 
     private void setUp() {
+
         FrameLayout.LayoutParams params = null;
         switch (videoPlayerStage) {
             case STABLE:
@@ -236,6 +242,11 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
 
                 videoPlayerStage = activity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? VideoPlayerStage.FULL_SCREEN : VideoPlayerStage.STABLE;
 
+                if (videoPlayerStage == VideoPlayerStage.FULL_SCREEN) {
+                    decorateUi();
+                } else {
+                    decorateScreenUi();
+                }
                 updateControllers();
             }
 
@@ -255,7 +266,8 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         });
 
 
-        imgMin.setOnClickListener(v -> {
+        imgMin.setOnClickListener(v ->
+        {
             if (playerView != null) {
                 if (videoPlayerStage == VideoPlayerStage.STABLE) {
                     FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()) / 2, Utility.dpSize(activity(), 100));
@@ -275,7 +287,6 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
                     videoPlayerStage = VideoPlayerStage.STABLE;
                     updateControllers();
                 }
-
             }
         });
 
@@ -308,21 +319,13 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         playerView.setControllerHideOnTouch(true);
         playerView.setControllerShowTimeoutMs(1500);
         playerView.setPlayer(player);
-
-
-        activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView), new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-
-
         player.setPlayWhenReady(shouldAutoPlay);
-
-
         MediaSource mediaSource = buildMediaSource(uri);
 
         player.prepare(mediaSource);
 
 //        LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
 //        player.prepare(loopingSource);
-
 
         player.addListener(new Player.EventListener() {
             @Override
@@ -354,6 +357,12 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
                     case Player.STATE_READY:
                         progressBar.setVisibility(View.GONE);
                         imgReplay.setVisibility(View.GONE);
+                        if (isConnected()) {
+                            shouldAutoPlay = false;
+                            player.setPlayWhenReady(false);
+                            showUSBAlert();
+                            return;
+                        }
                         break;
                     case Player.STATE_ENDED:
                         progressBar.setVisibility(View.GONE);
@@ -389,10 +398,34 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
             @Override
             public void onSeekProcessed() {
 
-
             }
         });
 
+    }
+
+    private void decorateScreenUi() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            View decorView = activity().getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+    }
+
+
+    private void decorateUi() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            View decorView = activity().getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
     }
 
 
@@ -438,26 +471,45 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         super.onResume();
         mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
         activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView), new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+        activity().registerReceiver(usbDetectorReceiver = new UsbDetectorReceiver(playerView), new IntentFilter("android.hardware.usb.action.USB_STATE"));
+
         if (player == null) {
             initializePlayer();
         } else {
         }
+
+
+        if (videoPlayerStage == VideoPlayerStage.FULL_SCREEN) {
+            decorateUi();
+        } else {
+            decorateScreenUi();
+        }
     }
+
 
     @Override
     public void onPause() {
         super.onPause();
-        mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
+        mAudioManager.unregisterMediaButtonEventReceiver(mRemoteControlResponder);
+        activity().unregisterReceiver(usbDetectorReceiver);
 
         if (player == null) {
 
         } else {
             shouldAutoPlay = false;
             player.setPlayWhenReady(false);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                player.setPlayWhenReady(true);
+                ((MainActivity) activity()).pictureInPictureMode();
+            }
         }
 
-        if (mediaReceiver != null)
+        if (mediaReceiver != null) {
             activity().unregisterReceiver(mediaReceiver);
+            mediaReceiver = null;
+        }
+
     }
 
     @Override
@@ -647,13 +699,84 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
             if (params != null)
                 player.setPlaybackParameters(params);
         }
+
+
+        if (videoPlayerStage == VideoPlayerStage.FULL_SCREEN) {
+            decorateUi();
+        } else {
+            decorateScreenUi();
+        }
     }
 
     @Override
     public void applyAction() {
-        if (player != null) {
-            shouldAutoPlay = !shouldAutoPlay;
+        if (player != null && mediaReceiver != null) {
+            if (isConnected()) {
+                shouldAutoPlay = false;
+                player.setPlayWhenReady(false);
+                showUSBAlert();
+                return;
+            }
+            shouldAutoPlay = !player.getPlayWhenReady();
             player.setPlayWhenReady(shouldAutoPlay);
+        }
+    }
+
+    private boolean isConnected() {
+        Intent intent = activity().registerReceiver(null, new IntentFilter("android.hardware.usb.action.USB_STATE"));
+        return  false;//intent.getExtras().getBoolean("connected");
+    }
+
+    public void showUSBAlert() {
+        if (alertUsbDialog == null) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity());
+            alertDialogBuilder.setTitle("Disconnect USB");
+            alertDialogBuilder.setMessage("Your device is connected to PC. Please disconnect the USB data conection to play videos");
+            alertDialogBuilder.setPositiveButton("GOT IT", (dialogInterface, args) -> {
+
+                if (videoPlayerStage == VideoPlayerStage.FULL_SCREEN) {
+                    decorateUi();
+                } else {
+                    decorateScreenUi();
+                }
+            });
+            alertUsbDialog = alertDialogBuilder.create();
+        }
+        if (!alertUsbDialog.isShowing())
+            alertUsbDialog.show();
+    }
+
+    public void playVideo(boolean status) {
+
+        if (status)
+            player.setPlayWhenReady(true);
+        else
+            player.setPlayWhenReady(false);
+
+    }
+
+    public class UsbDetectorReceiver extends BroadcastReceiver {
+        private PlayerView playerView;
+
+        public UsbDetectorReceiver(PlayerView playerView) {
+            this.playerView = playerView;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+//            if (intent.getExtras().getBoolean("connected")) {
+//                if (playerView != null) {
+//                    shouldAutoPlay = false;
+//                    player.setPlayWhenReady(false);
+//                    showUSBAlert();
+//                }
+//            } else {
+//                if (playerView != null && alertUsbDialog != null && alertUsbDialog.isShowing()) {
+//                    alertUsbDialog.dismiss();
+//                    shouldAutoPlay = true;
+//                    player.setPlayWhenReady(true);
+//                }
+//            }
         }
     }
 
@@ -676,6 +799,5 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
             }
         }
     }
-
 
 }

@@ -8,9 +8,11 @@ import android.view.KeyEvent;
 
 public class HeadSetActionReceiver extends BroadcastReceiver {
     private static final String TAG_MEDIA = "MEDIA";
-
+    public static int counter = 0;
     @Override
     public void onReceive(Context context, Intent intent) {
+        counter++;
+        Log.d(TAG_MEDIA,"Counter "+counter);
         String intentAction = intent.getAction();
         if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction))
         {
@@ -26,12 +28,15 @@ public class HeadSetActionReceiver extends BroadcastReceiver {
 
         if(event.getKeyCode() ==  KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
         {
+            Log.d(TAG_MEDIA,"MEDIA PLAY PAUSE");
             VideoPlayerFragment.iHeadSetsController.applyAction();
             return;
         }
 
         if(event.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK)
         {
+            Log.d(TAG_MEDIA,"MEDIA HEADSETHOOK");
+            if(counter%2==0)
             VideoPlayerFragment.iHeadSetsController.applyAction();
             return;
         }
