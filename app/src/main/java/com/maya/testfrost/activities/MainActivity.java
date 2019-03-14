@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
     @BindView(R.id.tvTitle)
     TextView tvTitle;
 
-
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
@@ -100,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
-    public static final String BROADCAST_ACTION = "com.example.sampleapplication";
+    public static final String BROADCAST_ACTION = "com.maya.video.actions";
+
     private ArrayList<RemoteAction> actions;
     private final PictureInPictureParams.Builder pictureInPictureParamsBuilder =
             new PictureInPictureParams.Builder();
@@ -246,6 +246,11 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
                     public void onReceive(Context context, Intent intent)
                     {
                         boolean isPlay = mediaFragment.player.getPlayWhenReady();
+                        if(mediaFragment.isConnected())
+                        {
+                           isPlay = true;
+                           mediaFragment.showUSBAlert();
+                        }
 
                         if (isPlay) {
                             setAction(false);
@@ -277,7 +282,6 @@ public class MainActivity extends AppCompatActivity implements IActivity, IRootA
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("TAGGED", "IS NEW");
     }
 
     private void createPipAction() {

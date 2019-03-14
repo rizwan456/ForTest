@@ -150,10 +150,10 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     private DefaultTrackSelector trackSelector;
     public boolean shouldAutoPlay;
     private BandwidthMeter bandwidthMeter;
-    private VideoPlayerStage videoPlayerStage, previousPlayerStage;
+    private VideoPlayerStage videoPlayerStage = VideoPlayerStage.STABLE, previousPlayerStage;
     private FrameLayout.LayoutParams params;
     private MediaReceiver mediaReceiver;
-    UsbDetectorReceiver usbDetectorReceiver;
+    private UsbDetectorReceiver usbDetectorReceiver;
     public static IHeadSetsController iHeadSetsController;
 
 
@@ -471,6 +471,10 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     @Override
     public void onResume() {
         super.onResume();
+        if(videoPlayerStage==VideoPlayerStage.PIP)
+        {
+            backToNormal();
+        }
         mAudioManager.registerMediaButtonEventReceiver(mRemoteControlResponder);
         activity().registerReceiver(mediaReceiver = new MediaReceiver(playerView), new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
         activity().registerReceiver(usbDetectorReceiver = new UsbDetectorReceiver(playerView), new IntentFilter("android.hardware.usb.action.USB_STATE"));
@@ -501,18 +505,21 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
+                if (alertUsbDialog != null && alertUsbDialog.isShowing()) {
+                    alertUsbDialog.dismiss();
+                }
                 ((MainActivity) activity()).setAction(player.getPlayWhenReady());
                 previousPlayerStage = videoPlayerStage;
                 videoPlayerStage = VideoPlayerStage.PIP;
                 params = (FrameLayout.LayoutParams) frameLayout.getLayoutParams();
                 frameLayout.setLayoutParams(new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
                 playerView.setUseController(false);
-                return;
             }
-            shouldAutoPlay = false;
-            player.setPlayWhenReady(false);
-
-
+            else
+            {
+                shouldAutoPlay = false;
+                player.setPlayWhenReady(false);
+            }
         }
 
         if (mediaReceiver != null) {
@@ -525,11 +532,10 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     @Override
     public void onStop() {
         super.onStop();
-        if(videoPlayerStage == VideoPlayerStage.PIP)
-        videoPlayerStage = previousPlayerStage;
+        if (videoPlayerStage == VideoPlayerStage.PIP)
+            videoPlayerStage = previousPlayerStage;
 
-        if (Util.SDK_INT <= 23)
-        {
+        if (Util.SDK_INT <= 23) {
             releasePlayer();
         }
         if (player == null) {
@@ -563,8 +569,7 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     }
 
 
-    public void backToNormal()
-    {
+    public void backToNormal() {
         videoPlayerStage = previousPlayerStage;
         frameLayout.setLayoutParams(params);
         if (videoPlayerStage == VideoPlayerStage.FULL_SCREEN) {
@@ -572,30 +577,6 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         } else {
             decorateScreenUi();
         }
-//        FrameLayout.LayoutParams params = null;
-//        switch (videoPlayerStage) {
-//        case STABLE:
-//        frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()), Utility.getScreenHeight(activity()) / 3));
-//        break;
-//
-//        case FULL_SCREEN:
-//            frameLayout.setLayoutParams(params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()), Utility.getScreenHeight(activity()) ));
-//        break;
-//
-//        case FLOATING:
-//        params = new FrameLayout.LayoutParams(Utility.getScreenWidth(activity()) / 2, Utility.dpSize(activity(), 100));
-//        params.setMargins(Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15), Utility.dpSize(activity(), 15));
-//        params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
-//
-//        frameLayout.setLayoutParams(params);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            frameLayout.setElevation(10);
-//        }
-//
-//        break;
-//        }
-//
-//        updateControllers();
     }
 
 
@@ -765,20 +746,19 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
     }
 
     @Override
-    public void applyAction()
-    {
-        if(videoPlayerStage == VideoPlayerStage.PIP)
-        {
+    public void applyAction() {
+        if (videoPlayerStage == VideoPlayerStage.PIP) {
             shouldAutoPlay = !player.getPlayWhenReady();
             player.setPlayWhenReady(shouldAutoPlay);
-            if(videoPlayerStage==VideoPlayerStage.PIP)
+            if (videoPlayerStage == VideoPlayerStage.PIP)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     ((MainActivity) activity()).setAction(shouldAutoPlay);
                 }
             return;
         }
         if (player != null && mediaReceiver != null) {
-            if (isConnected()) {
+            if (isConnected())
+            {
                 shouldAutoPlay = false;
                 player.setPlayWhenReady(false);
                 showUSBAlert();
@@ -789,12 +769,17 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         }
     }
 
-    private boolean isConnected() {
+    public boolean isConnected() {
         Intent intent = activity().registerReceiver(null, new IntentFilter("android.hardware.usb.action.USB_STATE"));
-        return  false;//intent.getExtras().getBoolean("connected");
+        return intent.getExtras().getBoolean("connected");
     }
 
-    public void showUSBAlert() {
+    public void showUSBAlert()
+    {
+        if (videoPlayerStage == VideoPlayerStage.PIP) {
+            Toast.makeText(activity(),"Your device is connected to PC. Please disconnect the USB data conection to play videos",Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (alertUsbDialog == null) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity());
             alertDialogBuilder.setTitle("Disconnect USB");
@@ -831,23 +816,25 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
 
         @Override
         public void onReceive(Context context, Intent intent) {
-//            if (intent.getExtras().getBoolean("connected")) {
-//                if (playerView != null) {
-//                    shouldAutoPlay = false;
-//                    player.setPlayWhenReady(false);
-//                    showUSBAlert();
-//                }
-//            } else {
-//                if (playerView != null && alertUsbDialog != null && alertUsbDialog.isShowing()) {
-//                    alertUsbDialog.dismiss();
-//                    shouldAutoPlay = true;
-//                    player.setPlayWhenReady(true);
-//                }
-//            }
+            if (intent.getExtras().getBoolean("connected")) {
+                if (playerView != null) {
+                    shouldAutoPlay = false;
+                    player.setPlayWhenReady(false);
+                    if (videoPlayerStage == VideoPlayerStage.PIP)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    ((MainActivity) activity()).setAction(false);
+                    }
+                    showUSBAlert();
+                }
+            } else {
+                if (playerView != null && alertUsbDialog != null && alertUsbDialog.isShowing()) {
+                    alertUsbDialog.dismiss();
+                    shouldAutoPlay = true;
+                    player.setPlayWhenReady(true);
+                }
+            }
         }
     }
-
-
 
 
     public class MediaReceiver extends BroadcastReceiver {
@@ -860,11 +847,10 @@ public class VideoPlayerFragment extends Fragment implements IFragment, ISpeedCo
         @Override
         public void onReceive(final Context context, Intent intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
-                if (playerView != null)
-                {
+                if (playerView != null) {
                     shouldAutoPlay = false;
                     player.setPlayWhenReady(false);
-                    if(videoPlayerStage==VideoPlayerStage.PIP)
+                    if (videoPlayerStage == VideoPlayerStage.PIP)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             ((MainActivity) activity()).setAction(false);
                         }
